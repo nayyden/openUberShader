@@ -1,0 +1,4 @@
+[Project]
+Name=glslUberShaderApp
+Manager=KDevCMakeManager
+VersionControl=kdevgit
