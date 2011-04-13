@@ -1,0 +1,21 @@
+0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  
+
+  0   0  0                      000   0                    0                
+  0   0  0                     0   0  0                    0                
+  0   0  0                     0      0                    0                
+  0   0  0 000    0000   0 00  0      0 000    0000    000 0   0000   0 00  
+  0   0  00   0  0    0   0     000   00   0       0  0   00  0    0   0    
+  0   0  0    0  000000   0        0  0    0   00000  0    0  000000   0    
+  0   0  0    0  0        0        0  0    0  0    0  0    0  0        0    
+  0   0  00   0  0    0   0    0   0  0    0  0   00  0   00  0    0   0    
+   000   0 000    0000    0     000   0    0   000 0   000 0   0000    0 
+
+0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  
+
+This is a project of 5 students from the University of Plovdiv, Bulgaria.
+It is a try to create shader with many features showcasing the capabilities of glsl.
+
+We use the Basic Ogre Framework as base project so we can focus on creating the shader.
+
+http://www.ogre3d.org/
+http://www.ogre3d.org/tikiwiki/tiki-index.php?page_ref_id=1627&pagenum=1
