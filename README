@@ -19,3 +19,12 @@ We use the Basic Ogre Framework as base project so we can focus on creating the 
 
 http://www.ogre3d.org/
 http://www.ogre3d.org/tikiwiki/tiki-index.php?page_ref_id=1627&pagenum=1
+
+Build:
+  -Linux:
+      install ogre
+      cd path_to_openUberShader
+      cmake .
+      make 
+  -Windows:
+      not tested yet

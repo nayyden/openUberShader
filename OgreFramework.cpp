@@ -209,7 +209,7 @@ bool OgreFramework::keyReleased(const OIS::KeyEvent &keyEventRef)
 bool OgreFramework::mouseMoved(const OIS::MouseEvent &evt)
 {
     cameraManager->injectMouseMove(evt);
-    m_pTrayMgr->injectMouseMove(evt);
+    m_pTrayMgr->   injectMouseMove(evt);
 
     return true;
 }
@@ -239,3 +239,9 @@ void OgreFramework::updateOgre(double timeSinceLastFrame)
 }
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
+
+void OgreFramework::sliderMoved(OgreBites::Slider* slider)
+{
+    
+}
+

@@ -45,6 +45,8 @@ public:
 	bool mousePressed(const OIS::MouseEvent &evt, OIS::MouseButtonID id); 
 	bool mouseReleased(const OIS::MouseEvent &evt, OIS::MouseButtonID id);
 	
+	void sliderMoved(OgreBites::Slider* slider);
+	
 	Ogre::Root*				m_pRoot;
 	Ogre::SceneManager*			m_pSceneMgr;
 	Ogre::RenderWindow*			m_pRenderWnd;
@@ -71,9 +73,9 @@ private:
 	bool					m_bShutDownOgre;
 	
 	Ogre::Vector3				m_TranslateVector;
-	Ogre::Real					m_MoveSpeed; 
+	Ogre::Real				m_MoveSpeed; 
 	Ogre::Degree				m_RotateSpeed; 
-	float						m_MoveScale; 
+	float					m_MoveScale; 
 	Ogre::Degree				m_RotScale;
 };
 
