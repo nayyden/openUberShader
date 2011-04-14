@@ -18,22 +18,22 @@ OgreFramework::OgreFramework()
     m_RotateSpeed		= 0.3f;
 
     m_bShutDownOgre		= false;
-    m_iNumScreenShots	= 0;
+    m_iNumScreenShots		= 0;
 
-    m_pRoot				= 0;
+    m_pRoot			= 0;
     m_pSceneMgr			= 0;
     m_pRenderWnd		= 0;
     m_pCamera			= 0;
     m_pViewport			= 0;
-    m_pLog				= 0;
+    m_pLog			= 0;
     m_pTimer			= 0;
 
     m_pInputMgr			= 0;
     m_pKeyboard			= 0;
     m_pMouse			= 0;
 
-    m_pTrayMgr          = 0;
-    m_FrameEvent        = Ogre::FrameEvent();
+    m_pTrayMgr          	= 0;
+    m_FrameEvent        	= Ogre::FrameEvent();
 }
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
@@ -121,10 +121,16 @@ bool OgreFramework::initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListen
     m_pTrayMgr = new OgreBites::SdkTrayManager("TrayMgr", m_pRenderWnd, m_pMouse, this);
     m_pTrayMgr->showFrameStats(OgreBites::TL_BOTTOMLEFT);
     m_pTrayMgr->showLogo(OgreBites::TL_BOTTOMRIGHT);
-    m_pTrayMgr->hideCursor();
+    //m_pTrayMgr->hideCursor();
 
     m_pRenderWnd->setActive(true);
-
+    
+    cameraManager	= new OgreBites::SdkCameraMan(m_pCamera);  
+    cameraCenter 	= m_pSceneMgr->getRootSceneNode()->createChildSceneNode("cameraCenter");
+    cameraCenter ->setPosition(Ogre::Vector3(0,0,0));
+    cameraManager->setTarget(cameraCenter);
+    cameraManager->setStyle(OgreBites::CS_ORBIT);
+    
     return true;
 }
 
@@ -202,8 +208,8 @@ bool OgreFramework::keyReleased(const OIS::KeyEvent &keyEventRef)
 
 bool OgreFramework::mouseMoved(const OIS::MouseEvent &evt)
 {
-    m_pCamera->yaw(Degree(evt.state.X.rel * -0.1f));
-    m_pCamera->pitch(Degree(evt.state.Y.rel * -0.1f));
+    cameraManager->injectMouseMove(evt);
+    m_pTrayMgr->injectMouseMove(evt);
 
     return true;
 }
@@ -212,6 +218,7 @@ bool OgreFramework::mouseMoved(const OIS::MouseEvent &evt)
 
 bool OgreFramework::mousePressed(const OIS::MouseEvent &evt, OIS::MouseButtonID id)
 {
+    cameraManager->injectMouseDown(evt, id);
     return true;
 }
 
@@ -219,6 +226,7 @@ bool OgreFramework::mousePressed(const OIS::MouseEvent &evt, OIS::MouseButtonID 
 
 bool OgreFramework::mouseReleased(const OIS::MouseEvent &evt, OIS::MouseButtonID id)
 {
+    cameraManager->injectMouseUp(evt, id);
     return true;
 }
 
@@ -226,43 +234,8 @@ bool OgreFramework::mouseReleased(const OIS::MouseEvent &evt, OIS::MouseButtonID
 
 void OgreFramework::updateOgre(double timeSinceLastFrame)
 {
-    m_MoveScale = m_MoveSpeed   * (float)timeSinceLastFrame;
-    m_RotScale  = m_RotateSpeed * (float)timeSinceLastFrame;
-
-    m_TranslateVector = Vector3::ZERO;
-
-    getInput();
-    moveCamera();
-
     m_FrameEvent.timeSinceLastFrame = timeSinceLastFrame;
     m_pTrayMgr->frameRenderingQueued(m_FrameEvent);
-}
-
-//|||||||||||||||||||||||||||||||||||||||||||||||
-
-void OgreFramework::moveCamera()
-{
-    if(m_pKeyboard->isKeyDown(OIS::KC_LSHIFT))
-        m_pCamera->moveRelative(m_TranslateVector);
-    else
-        m_pCamera->moveRelative(m_TranslateVector / 10);
-}
-
-//|||||||||||||||||||||||||||||||||||||||||||||||
-
-void OgreFramework::getInput()
-{
-    if(m_pKeyboard->isKeyDown(OIS::KC_A))
-        m_TranslateVector.x = -m_MoveScale;
-
-    if(m_pKeyboard->isKeyDown(OIS::KC_D))
-        m_TranslateVector.x = m_MoveScale;
-
-    if(m_pKeyboard->isKeyDown(OIS::KC_W))
-        m_TranslateVector.z = -m_MoveScale;
-
-    if(m_pKeyboard->isKeyDown(OIS::KC_S))
-        m_TranslateVector.z = m_MoveScale;
 }
 
 //|||||||||||||||||||||||||||||||||||||||||||||||

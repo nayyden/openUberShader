@@ -23,6 +23,7 @@
 #include <OIS/OISMouse.h>
 
 #include <OGRE/SdkTrays.h>
+#include "OGRE/SdkCameraMan.h"
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
@@ -34,8 +35,6 @@ public:
 
 	bool initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListener = 0, OIS::MouseListener *pMouseListener = 0);
 	void updateOgre(double timeSinceLastFrame);
-	void moveCamera();
-	void getInput();
 
 	bool isOgreToBeShutDown()const{return m_bShutDownOgre;}  
 
@@ -46,7 +45,7 @@ public:
 	bool mousePressed(const OIS::MouseEvent &evt, OIS::MouseButtonID id); 
 	bool mouseReleased(const OIS::MouseEvent &evt, OIS::MouseButtonID id);
 	
-	Ogre::Root*					m_pRoot;
+	Ogre::Root*				m_pRoot;
 	Ogre::SceneManager*			m_pSceneMgr;
 	Ogre::RenderWindow*			m_pRenderWnd;
 	Ogre::Camera*				m_pCamera;
@@ -56,17 +55,20 @@ public:
 	
 	OIS::InputManager*			m_pInputMgr;
 	OIS::Keyboard*				m_pKeyboard;
-	OIS::Mouse*					m_pMouse;
+	OIS::Mouse*				m_pMouse;
+	
+	OgreBites::SdkCameraMan*		cameraManager;
+	Ogre::SceneNode*			cameraCenter;
 
 private:
 	OgreFramework(const OgreFramework&);
 	OgreFramework& operator= (const OgreFramework&);
 
-	OgreBites::SdkTrayManager*	m_pTrayMgr;
-    Ogre::FrameEvent            m_FrameEvent;
-	int							m_iNumScreenShots;
+	OgreBites::SdkTrayManager*		m_pTrayMgr;
+	Ogre::FrameEvent            		m_FrameEvent;
+	int					m_iNumScreenShots;
 
-	bool						m_bShutDownOgre;
+	bool					m_bShutDownOgre;
 	
 	Ogre::Vector3				m_TranslateVector;
 	Ogre::Real					m_MoveSpeed; 

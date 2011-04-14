@@ -9,7 +9,7 @@
 
 App::App()
 {
-	m_pCubeNode			= 0;
+	m_pCubeNode		= 0;
 	m_pCubeEntity		= 0;
 }
 
@@ -25,12 +25,12 @@ App::~App()
 void App::startDemo()
 {
 	new OgreFramework();
-	if(!OgreFramework::getSingletonPtr()->initOgre("App v1.0", this, 0))
+	if(!OgreFramework::getSingletonPtr()->initOgre("Open Uber Shader", this, 0))
 		return;
 	
 	m_bShutdown = false;
 
-	OgreFramework::getSingletonPtr()->m_pLog->logMessage("Demo initialized!");
+	OgreFramework::getSingletonPtr()->m_pLog->logMessage("Application initialized!");
 
 	setupDemoScene();
 	runDemo();

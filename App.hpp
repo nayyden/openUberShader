@@ -27,7 +27,7 @@ private:
 	Ogre::SceneNode*			m_pCubeNode;
 	Ogre::Entity*				m_pCubeEntity;
 
-	bool						m_bShutdown;
+	bool					m_bShutdown;
 };
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
