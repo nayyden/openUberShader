@@ -136,11 +136,22 @@ bool OgreFramework::initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListen
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
+void OgreFramework::setUpGUI()
+{
+    m_pTrayMgr->createButton(OgreBites::TL_BOTTOMRIGHT, "Button", "Press Me");
+    m_pTrayMgr->createLongSlider(OgreBites::TL_BOTTOMRIGHT, "RedDiffuseSlider", "Diffuse", 100, 60, 0.0f, 1.0f, 256);
+    
+}
+
+//|||||||||||||||||||||||||||||||||||||||||||||||
+
 OgreFramework::~OgreFramework()
 {
     if(m_pInputMgr) OIS::InputManager::destroyInputSystem(m_pInputMgr);
     if(m_pTrayMgr)  delete m_pTrayMgr;
     if(m_pRoot)     delete m_pRoot;
+    if(cameraManager) delete cameraManager;
+   
 }
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
@@ -197,6 +208,7 @@ bool OgreFramework::keyPressed(const OIS::KeyEvent &keyEventRef)
     return true;
 }
 
+
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
 bool OgreFramework::keyReleased(const OIS::KeyEvent &keyEventRef)
@@ -208,16 +220,24 @@ bool OgreFramework::keyReleased(const OIS::KeyEvent &keyEventRef)
 
 bool OgreFramework::mouseMoved(const OIS::MouseEvent &evt)
 {
+    /* For the GUI ? */
+    if(m_pTrayMgr->injectMouseMove(evt)) 
+        return true;
+   
+    /* If not for the GUI */
     cameraManager->injectMouseMove(evt);
-    m_pTrayMgr->   injectMouseMove(evt);
-
-    return true;
+    return true;   
 }
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
 bool OgreFramework::mousePressed(const OIS::MouseEvent &evt, OIS::MouseButtonID id)
 {
+    /* For the GUI ? */
+    if(m_pTrayMgr->injectMouseDown(evt, id))
+        return true;
+    
+    /* If not for the GUI */
     cameraManager->injectMouseDown(evt, id);
     return true;
 }
@@ -226,6 +246,11 @@ bool OgreFramework::mousePressed(const OIS::MouseEvent &evt, OIS::MouseButtonID 
 
 bool OgreFramework::mouseReleased(const OIS::MouseEvent &evt, OIS::MouseButtonID id)
 {
+    /* For the GUI ? */
+    if(m_pTrayMgr->injectMouseUp(evt, id))
+        return true;
+    
+    /* If not for the GUI */
     cameraManager->injectMouseUp(evt, id);
     return true;
 }
@@ -242,6 +267,15 @@ void OgreFramework::updateOgre(double timeSinceLastFrame)
 
 void OgreFramework::sliderMoved(OgreBites::Slider* slider)
 {
+    if(slider->getName() == "RedDiffuseSlider") {  
+        Ogre::MaterialPtr material = Ogre::MaterialManager::getSingletonPtr()->getByName("Ogre/Eyes");
+        if(material.getPointer()) {
+            float sliderVal = slider->getValue();
+            material->setDiffuse(sliderVal, 0, 0, 0);
+        } else {
+            return;
+        }
+    }
     
 }
 

@@ -22,7 +22,8 @@ public:
 
 private:
 	void setupDemoScene();
-	void runDemo();
+    void runDemo();
+    
 
 	Ogre::SceneNode*			m_pCubeNode;
 	Ogre::Entity*				m_pCubeEntity;

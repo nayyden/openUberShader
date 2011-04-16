@@ -47,7 +47,9 @@ void App::setupDemoScene()
 	m_pCubeEntity = OgreFramework::getSingletonPtr()->m_pSceneMgr->createEntity("Cube", "ogrehead.mesh");
 	m_pCubeNode = OgreFramework::getSingletonPtr()->m_pSceneMgr->getRootSceneNode()->createChildSceneNode("CubeNode");
 	m_pCubeNode->attachObject(m_pCubeEntity);
+    OgreFramework::getSingletonPtr()->setUpGUI();
 }
+
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 

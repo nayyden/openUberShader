@@ -35,6 +35,7 @@ public:
 
 	bool initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListener = 0, OIS::MouseListener *pMouseListener = 0);
 	void updateOgre(double timeSinceLastFrame);
+    void setUpGUI();
 
 	bool isOgreToBeShutDown()const{return m_bShutDownOgre;}  
 
@@ -44,7 +45,6 @@ public:
 	bool mouseMoved(const OIS::MouseEvent &evt);
 	bool mousePressed(const OIS::MouseEvent &evt, OIS::MouseButtonID id); 
 	bool mouseReleased(const OIS::MouseEvent &evt, OIS::MouseButtonID id);
-	
 	void sliderMoved(OgreBites::Slider* slider);
 	
 	Ogre::Root*				m_pRoot;
@@ -65,7 +65,7 @@ public:
 private:
 	OgreFramework(const OgreFramework&);
 	OgreFramework& operator= (const OgreFramework&);
-
+    
 	OgreBites::SdkTrayManager*		m_pTrayMgr;
 	Ogre::FrameEvent            		m_FrameEvent;
 	int					m_iNumScreenShots;
