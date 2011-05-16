@@ -139,8 +139,13 @@ bool OgreFramework::initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListen
 void OgreFramework::setUpGUI()
 {
     m_pTrayMgr->createButton(OgreBites::TL_BOTTOMRIGHT, "Button", "Press Me");
-    m_pTrayMgr->createLongSlider(OgreBites::TL_BOTTOMRIGHT, "RedDiffuseSlider", "Diffuse", 100, 60, 0.0f, 1.0f, 256);
+    m_pTrayMgr->createLongSlider(OgreBites::TL_BOTTOMRIGHT, "LightX", "LightX", 100, 60, -400.0f, 400.0f, 256);
+    m_pTrayMgr->createLongSlider(OgreBites::TL_BOTTOMRIGHT, "LightY", "LightY", 100, 60, -400.0f, 400.0f, 256);
+    m_pTrayMgr->createLongSlider(OgreBites::TL_BOTTOMRIGHT, "LightZ", "LightZ", 100, 60, -400.0f, 400.0f, 256);
+    m_pTrayMgr->createCheckBox(OgreBites::TL_BOTTOMRIGHT, "MatSwitch", "TurnBumpMap");
     
+    
+   
 }
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
@@ -265,17 +270,48 @@ void OgreFramework::updateOgre(double timeSinceLastFrame)
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
+void OgreFramework::setUpShaderParams()
+{
+    //m_pMaterial = Ogre::MaterialManager::getSingletonPtr()->getByName("wiggle");
+    //vertexShaderParams = m_pMaterial->getTechnique(0)->getPass(0)->getVertexProgramParameters();
+}
+
+//|||||||||||||||||||||||||||||||||||||||||||||||
+
 void OgreFramework::sliderMoved(OgreBites::Slider* slider)
 {
-    if(slider->getName() == "RedDiffuseSlider") {  
-        Ogre::MaterialPtr material = Ogre::MaterialManager::getSingletonPtr()->getByName("Ogre/Eyes");
-        if(material.getPointer()) {
-            float sliderVal = slider->getValue();
-            material->setDiffuse(sliderVal, 0, 0, 0);
-        } else {
-            return;
-        }
+    if(slider->getName() == "LightX") {  
+       float xPos = slider->getValue();
+       Ogre::Vector3 lightPos = this->m_pSceneMgr->getLight("Light")->getPosition();
+       this->m_pSceneMgr->getLight("Light")->setPosition(xPos, lightPos.y, lightPos.z);
     }
-    
+    if(slider->getName() == "LightY") {  
+       float yPos = slider->getValue();
+       Ogre::Vector3 lightPos = this->m_pSceneMgr->getLight("Light")->getPosition();
+       this->m_pSceneMgr->getLight("Light")->setPosition(lightPos.x, yPos, lightPos.z);
+    }
+    if(slider->getName() == "LightZ") {  
+       float zPos = slider->getValue();
+       Ogre::Vector3 lightPos = this->m_pSceneMgr->getLight("Light")->getPosition();
+       this->m_pSceneMgr->getLight("Light")->setPosition(lightPos.x, lightPos.y, zPos);
+    }
+   
+}
+
+
+void OgreFramework::checkBoxToggled(OgreBites::CheckBox *checkBox)
+{
+    if(checkBox->getName() == "MatSwitch") {
+        if(checkBox->isChecked()) {
+          Ogre::MaterialPtr bumpMat = Ogre::MaterialManager::getSingletonPtr()->getByName("Bump_OZONE");
+          Ogre::Entity *ent =  this->m_pSceneMgr->getEntity("Cube");
+          ent->setMaterial(bumpMat);
+        } else if(!checkBox->isChecked()) {
+            Ogre::MaterialPtr simpleMat = Ogre::MaterialManager::getSingletonPtr()->getByName("Simple");
+            Ogre::Entity *ent =  this->m_pSceneMgr->getEntity("Cube");           
+            ent->setMaterial(simpleMat);
+        }
+       
+    }
 }
 

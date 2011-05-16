@@ -46,6 +46,8 @@ public:
 	bool mousePressed(const OIS::MouseEvent &evt, OIS::MouseButtonID id); 
 	bool mouseReleased(const OIS::MouseEvent &evt, OIS::MouseButtonID id);
 	void sliderMoved(OgreBites::Slider* slider);
+    void checkBoxToggled(OgreBites::CheckBox *checkBox);
+    void setUpShaderParams();
 	
 	Ogre::Root*				m_pRoot;
 	Ogre::SceneManager*			m_pSceneMgr;
@@ -61,6 +63,7 @@ public:
 	
 	OgreBites::SdkCameraMan*		cameraManager;
 	Ogre::SceneNode*			cameraCenter;
+    
 
 private:
 	OgreFramework(const OgreFramework&);
@@ -77,6 +80,10 @@ private:
 	Ogre::Degree				m_RotateSpeed; 
 	float					m_MoveScale; 
 	Ogre::Degree				m_RotScale;
+    Ogre::MaterialPtr m_pMaterial;
+    Ogre::GpuProgramPtr m_pVertexShader;
+    Ogre::GpuProgramPtr m_pFragmentShader;
+    Ogre::GpuProgramParametersSharedPtr vertexShaderParams;
 };
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
