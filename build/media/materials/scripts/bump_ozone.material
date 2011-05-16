@@ -1,0 +1,49 @@
+vertex_program vsBump glsl
+{
+	source vsBump.glsl
+}
+
+fragment_program psBump glsl
+{
+	source psBump.glsl
+}
+
+material Bump_OZONE
+{
+	technique GLSL
+	{
+		pass
+		{
+			vertex_program_ref vsBump
+			{
+			}
+			fragment_program_ref psBump
+			{
+				param_named normalMap int 1
+				param_named colorMap int 0
+				param_named invRadius float 45.0
+				param_named fRoughness float 0.2
+			}
+			texture_unit
+			{
+				texture color_map.jpg
+			}
+			texture_unit
+			{
+				texture atheneNormalMap.png
+			}
+			
+		}
+	}
+}
+
+
+material Simple
+{
+	technique
+	{
+		pass
+		{
+		}
+	}
+}
