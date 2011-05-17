@@ -121,6 +121,9 @@ bool OgreFramework::initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListen
     m_pTrayMgr = new OgreBites::SdkTrayManager("TrayMgr", m_pRenderWnd, m_pMouse, this);
     m_pTrayMgr->showFrameStats(OgreBites::TL_BOTTOMLEFT);
     m_pTrayMgr->showLogo(OgreBites::TL_BOTTOMRIGHT);
+    
+    m_pTrayMgr->hideTrays();
+    this->guiVisible = false;
     //m_pTrayMgr->hideCursor();
 
     m_pRenderWnd->setActive(true);
@@ -138,11 +141,22 @@ bool OgreFramework::initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListen
 
 void OgreFramework::setUpGUI()
 {
-    m_pTrayMgr->createButton(OgreBites::TL_BOTTOMRIGHT, "Button", "Press Me");
-    m_pTrayMgr->createLongSlider(OgreBites::TL_BOTTOMRIGHT, "LightX", "LightX", 100, 60, -400.0f, 400.0f, 256);
-    m_pTrayMgr->createLongSlider(OgreBites::TL_BOTTOMRIGHT, "LightY", "LightY", 100, 60, -400.0f, 400.0f, 256);
-    m_pTrayMgr->createLongSlider(OgreBites::TL_BOTTOMRIGHT, "LightZ", "LightZ", 100, 60, -400.0f, 400.0f, 256);
+    this->currentLight = "Light1";
+    Ogre::StringVector strVec;
+    strVec.push_back("Light1");
+    strVec.push_back("Light2");
+    OgreBites::SelectMenu *menu = m_pTrayMgr->createLongSelectMenu(OgreBites::TL_TOPRIGHT, "Lights", "Lights", 200, 100, 2, strVec);
+    menu->selectItem(0, false);
+    enableLight =  m_pTrayMgr->createCheckBox(OgreBites::TL_TOPRIGHT, "EnableLight", "Enable");
+    enableLight->setChecked(true, false);
+
+    lightPosx = m_pTrayMgr->createLongSlider(OgreBites::TL_TOPRIGHT, "LightX", "LightX", 100, 60, -400.0f, 400.0f, 256);
+    lightPosy = m_pTrayMgr->createLongSlider(OgreBites::TL_TOPRIGHT, "LightY", "LightY", 100, 60, -400.0f, 400.0f, 256);
+    lightPosz =  m_pTrayMgr->createLongSlider(OgreBites::TL_TOPRIGHT, "LightZ", "LightZ", 100, 60, -400.0f, 400.0f, 256);
     m_pTrayMgr->createCheckBox(OgreBites::TL_BOTTOMRIGHT, "MatSwitch", "TurnBumpMap");
+    m_pTrayMgr->createCheckBox(OgreBites::TL_BOTTOMRIGHT, "MultiLights", "Multiple Lights");
+    
+    
     
     
    
@@ -209,6 +223,17 @@ bool OgreFramework::keyPressed(const OIS::KeyEvent &keyEventRef)
             m_pTrayMgr->showFrameStats(OgreBites::TL_BOTTOMLEFT);
         }
     }
+    
+    if(m_pKeyboard->isKeyDown(OIS::KC_P)) {
+        if(this->guiVisible) {
+            m_pTrayMgr->hideTrays();
+            this->guiVisible = false;
+        } else {
+            m_pTrayMgr->showTrays();
+            this->guiVisible = true;
+        }
+        
+    }
 
     return true;
 }
@@ -272,8 +297,9 @@ void OgreFramework::updateOgre(double timeSinceLastFrame)
 
 void OgreFramework::setUpShaderParams()
 {
-    //m_pMaterial = Ogre::MaterialManager::getSingletonPtr()->getByName("wiggle");
-    //vertexShaderParams = m_pMaterial->getTechnique(0)->getPass(0)->getVertexProgramParameters();
+    m_pMaterial = Ogre::MaterialManager::getSingletonPtr()->getByName("Bump_OZONE");
+    vertexShaderParams = m_pMaterial->getTechnique(0)->getPass(0)->getVertexProgramParameters();
+    fragmentShaderParams = m_pMaterial->getTechnique(0)->getPass(0)->getFragmentProgramParameters();
 }
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
@@ -282,18 +308,18 @@ void OgreFramework::sliderMoved(OgreBites::Slider* slider)
 {
     if(slider->getName() == "LightX") {  
        float xPos = slider->getValue();
-       Ogre::Vector3 lightPos = this->m_pSceneMgr->getLight("Light")->getPosition();
-       this->m_pSceneMgr->getLight("Light")->setPosition(xPos, lightPos.y, lightPos.z);
+       Ogre::Vector3 lightPos = this->m_pSceneMgr->getLight(currentLight)->getPosition();
+       this->m_pSceneMgr->getLight(currentLight)->setPosition(xPos, lightPos.y, lightPos.z);
     }
     if(slider->getName() == "LightY") {  
        float yPos = slider->getValue();
-       Ogre::Vector3 lightPos = this->m_pSceneMgr->getLight("Light")->getPosition();
-       this->m_pSceneMgr->getLight("Light")->setPosition(lightPos.x, yPos, lightPos.z);
+       Ogre::Vector3 lightPos = this->m_pSceneMgr->getLight(currentLight)->getPosition();
+       this->m_pSceneMgr->getLight(currentLight)->setPosition(lightPos.x, yPos, lightPos.z);
     }
     if(slider->getName() == "LightZ") {  
        float zPos = slider->getValue();
-       Ogre::Vector3 lightPos = this->m_pSceneMgr->getLight("Light")->getPosition();
-       this->m_pSceneMgr->getLight("Light")->setPosition(lightPos.x, lightPos.y, zPos);
+       Ogre::Vector3 lightPos = this->m_pSceneMgr->getLight(currentLight)->getPosition();
+       this->m_pSceneMgr->getLight(currentLight)->setPosition(lightPos.x, lightPos.y, zPos);
     }
    
 }
@@ -313,5 +339,68 @@ void OgreFramework::checkBoxToggled(OgreBites::CheckBox *checkBox)
         }
        
     }
+    
+    if(checkBox->getName() == "EnableLight") {
+        Ogre::Light *l = this->m_pSceneMgr->getLight(currentLight); 
+           if(checkBox->isChecked()) {
+               l->setVisible(true);
+               return;
+           } else {
+               l->setVisible(false);
+               return;
+           }
+    }
+    
+    if(checkBox->getName() == "MultiLights") {
+        if(checkBox->isChecked()) {
+            this->vertexShaderParams->setNamedConstant("multiLight", 1);
+            this->fragmentShaderParams->setNamedConstant("multiLight", 1);
+        } else {          
+            this->vertexShaderParams->setNamedConstant("multiLight", 0);
+            this->fragmentShaderParams->setNamedConstant("multiLight", 0);
+        }
+    }
+}
+
+void OgreFramework::updateLightVis()
+{
+    Ogre::Light *light =  this->m_pSceneMgr->getLight(currentLight);
+    if(light->isVisible()) {
+        enableLight->setChecked(true, false);
+        return;
+    } else {
+        enableLight->setChecked(false, false);
+        return;
+    }
+    
+}
+
+
+void OgreFramework::updateLightPos()
+{
+    Ogre::Light *light =  this->m_pSceneMgr->getLight(currentLight);
+  
+    
+    Ogre::Vector3 lightPos = light->getPosition();
+    lightPosx->setValue(lightPos.x);
+    lightPosy->setValue(lightPos.y);
+    lightPosz->setValue(lightPos.z);   
+}
+
+void OgreFramework::itemSelected(OgreBites::SelectMenu *menu)
+{
+   int choice =  menu->getSelectionIndex();
+   if(choice == 0) {
+       this->currentLight = "Light1";
+       updateLightPos();
+       updateLightVis();
+       return;
+   } else if(choice == 1) {
+       this->currentLight = "Light2";
+       updateLightPos();
+       updateLightVis();
+   }
+   
+   return ;
 }
 

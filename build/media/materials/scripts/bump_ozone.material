@@ -14,29 +14,35 @@ material Bump_OZONE
 	{
 		pass
 		{
+			//diffuse 1.0 1.0 1.0
 			vertex_program_ref vsBump
 			{
+				param_named multiLight int 1
 			}
 			fragment_program_ref psBump
 			{
 				param_named normalMap int 1
-				param_named colorMap int 0
-				param_named invRadius float 45.0
-				param_named fRoughness float 0.2
+				param_named aoMap int 0
+				param_named invRadius float 0.0
+				param_named fRoughness float 0.7
+				param_named multiLight int 1
 			}
 			texture_unit
 			{
-				texture color_map.jpg
+				texture AO.png
 			}
 			texture_unit
 			{
+				//texture normal_ts.png
 				texture atheneNormalMap.png
+				//texture NormalAO.png
+				//texture NORMAL_TS.png
+				
 			}
 			
 		}
 	}
 }
-
 
 material Simple
 {
@@ -47,3 +53,4 @@ material Simple
 		}
 	}
 }
+	

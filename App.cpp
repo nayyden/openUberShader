@@ -42,7 +42,8 @@ void App::setupDemoScene()
 {
     OgreFramework::getSingletonPtr()->m_pSceneMgr->setSkyBox(true, "Examples/SpaceSkyBox");
 
-    OgreFramework::getSingletonPtr()->m_pSceneMgr->createLight("Light")->setPosition(75,75,75);
+    OgreFramework::getSingletonPtr()->m_pSceneMgr->createLight("Light1")->setPosition(75,75,75);
+	OgreFramework::getSingletonPtr()->m_pSceneMgr->createLight("Light2")->setPosition(75, 75, -75);
 
     m_pCubeEntity = OgreFramework::getSingletonPtr()->m_pSceneMgr->createEntity("Cube", "athene.mesh");
     m_pCubeNode = OgreFramework::getSingletonPtr()->m_pSceneMgr->getRootSceneNode()->createChildSceneNode("CubeNode");

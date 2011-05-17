@@ -47,7 +47,10 @@ public:
 	bool mouseReleased(const OIS::MouseEvent &evt, OIS::MouseButtonID id);
 	void sliderMoved(OgreBites::Slider* slider);
     void checkBoxToggled(OgreBites::CheckBox *checkBox);
+    void itemSelected(OgreBites::SelectMenu *menu);
     void setUpShaderParams();
+    void updateLightPos();
+    void updateLightVis();
 	
 	Ogre::Root*				m_pRoot;
 	Ogre::SceneManager*			m_pSceneMgr;
@@ -84,6 +87,13 @@ private:
     Ogre::GpuProgramPtr m_pVertexShader;
     Ogre::GpuProgramPtr m_pFragmentShader;
     Ogre::GpuProgramParametersSharedPtr vertexShaderParams;
+    Ogre::GpuProgramParametersSharedPtr fragmentShaderParams;
+    OgreBites::Slider *lightPosx;
+    OgreBites::Slider *lightPosy;
+    OgreBites::Slider *lightPosz;
+    OgreBites::CheckBox *enableLight;
+    bool guiVisible;
+    Ogre::String currentLight;
 };
 
 //|||||||||||||||||||||||||||||||||||||||||||||||

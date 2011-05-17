@@ -1,35 +1,53 @@
-varying vec3 lightVec;
+#define NUM_LIGHTS 2
+#define MAX_LIGHTS 6
+varying vec3 lightVec[MAX_LIGHTS];
 varying vec3 eyeVec;
 varying vec2 texCoord;
-uniform sampler2D colorMap;
+uniform sampler2D aoMap;
 uniform sampler2D normalMap;
 uniform float invRadius;
 uniform float fRoughness;
+uniform int multiLight;
 void main (void)
 {
+	vec4 final_color = vec4(0.0, 0.0, 0.0, 0.0);
+	float att = 0.0;
+	vec3 norm =  texture2D(normalMap, texCoord).xyz ;
+	vec3 n = normalize( norm* 2.0 - 1.0);
 	const float PI = 3.14159;
-	float distSqr = dot(lightVec, lightVec);
-	float att = clamp( invRadius * sqrt(distSqr), 0.0, 1.0);
-	vec3 lVec = lightVec *inversesqrt(distSqr);
+	int i;
+	float base = texture2D(aoMap, texCoord).r;
 	
-	
+	if(multiLight == 0) {
+		float distSqr = dot(lightVec[0], lightVec[0]);
+		att = clamp(1.0 - invRadius * sqrt(distSqr), 0.0, 1.0);
+		vec3 lVec = lightVec[0] * inversesqrt(distSqr);
 
-	vec3 vVec = normalize(eyeVec);
+		vec3 vVec = normalize(eyeVec);
+		vec3 R = reflect(-vVec, n);
+		vec4 vAmbient = gl_LightSource[0].ambient * gl_FrontMaterial.ambient;
 	
-	vec4 base = texture2D(colorMap, texCoord);
+		float diffuse = max( dot(lVec, n), 0.0 );	
+		vec4 vDiffuse = gl_FrontMaterial.diffuse * diffuse  ;	
+		final_color += vDiffuse;
+	} else if(multiLight == 1) {
 	
-	vec3 n = normalize( texture2D(normalMap, texCoord).xyz * 2.0 - 1.0);
-	//vec3 bump = normalize( texture2D(normalMap, texCoord).xyz );
-	vec4 vAmbient = gl_LightSource[0].ambient * gl_FrontMaterial.ambient;
+		for(i = 0; i < NUM_LIGHTS; i++) {
+		
+			float distSqr = dot(lightVec[i], lightVec[i]);
+			att = clamp(1.0 - invRadius * sqrt(distSqr), 0.0, 1.0);
+			vec3 lVec = lightVec[i] * inversesqrt(distSqr);
 
-	float diffuse = max(  0.0, dot(n, lVec) );
-	
-	vec4 vDiffuse =  gl_FrontMaterial.diffuse *
-					diffuse;	
-
-	
- 
-    // Compute the other aliases
+			vec3 vVec = normalize(eyeVec);
+			vec3 R = reflect(-vVec, n);
+			vec4 vAmbient = gl_LightSource[i].ambient * gl_FrontMaterial.ambient;
+			
+			float diffuse = max( dot(lVec, n), 0.0 );	
+			vec4 vDiffuse = gl_FrontMaterial.diffuse * diffuse  ;	
+			final_color += vDiffuse + vAmbient;
+		}
+	}
+  /*  // Compute the other aliases
     float alpha    = max( acos( dot( vVec, n ) ), acos( dot( lVec, n ) ) );
 	
     float beta     = min( acos( dot(lVec, n ) ), acos( dot( vVec, n ) ) );
@@ -55,20 +73,12 @@ void main (void)
     float A = gamma * C2 * tan( beta );
     float B = (1.0 - abs( gamma )) * C3 * tan( (alpha + beta) / 2.0 );
  
-   vec3 final =   gl_FrontMaterial.diffuse.xyz * max( 0.0, dot( n, lVec) ) * ( C1 + A + B );
- 
- 
-	float specular = pow(clamp(dot(reflect(-lVec, n), vVec), 0.0, 1.0), 
-	                 gl_FrontMaterial.shininess );
-	
-	vec4 vSpecular = gl_LightSource[0].specular * gl_FrontMaterial.specular * 
-					 specular;
-	
-	
-	gl_FragColor = (vec4(final, 1.0) + (vSpecular  - 0.2 ))*att; 
+   vec3 final =  base *  
+		gl_FrontMaterial.diffuse.xyz * max( 0.0, dot( n, lVec) ) * ( C1 + A + B );
+
+	gl_FragColor = vec4(final, 1.0); */
     	
-	gl_FragColor = (vDiffuse )*att;	// comment this for oren nayar
-	
+	gl_FragColor = (final_color ) * att ; // comment this for oren nayar
 	
 	
 }
