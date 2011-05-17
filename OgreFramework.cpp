@@ -154,7 +154,7 @@ void OgreFramework::setUpGUI()
     lightPosy = m_pTrayMgr->createLongSlider(OgreBites::TL_TOPRIGHT, "LightY", "LightY", 100, 60, -400.0f, 400.0f, 256);
     lightPosz =  m_pTrayMgr->createLongSlider(OgreBites::TL_TOPRIGHT, "LightZ", "LightZ", 100, 60, -400.0f, 400.0f, 256);
     m_pTrayMgr->createCheckBox(OgreBites::TL_BOTTOMRIGHT, "MatSwitch", "TurnBumpMap");
-    m_pTrayMgr->createCheckBox(OgreBites::TL_BOTTOMRIGHT, "MultiLights", "Multiple Lights");
+    m_pTrayMgr->createCheckBox(OgreBites::TL_BOTTOMRIGHT, "MultiLights", "Multiple Lights")->setChecked(true, false);
     
     
     
@@ -297,9 +297,11 @@ void OgreFramework::updateOgre(double timeSinceLastFrame)
 
 void OgreFramework::setUpShaderParams()
 {
-    m_pMaterial = Ogre::MaterialManager::getSingletonPtr()->getByName("Bump_OZONE");
-    vertexShaderParams = m_pMaterial->getTechnique(0)->getPass(0)->getVertexProgramParameters();
-    fragmentShaderParams = m_pMaterial->getTechnique(0)->getPass(0)->getFragmentProgramParameters();
+    
+   
+    Ogre::MaterialPtr mat = Ogre::MaterialManager::getSingletonPtr()->getByName("Bump_OZONE");
+    vertexShaderParams = mat->getTechnique(0)->getPass(0)->getVertexProgramParameters();
+    fragmentShaderParams = mat->getTechnique(0)->getPass(0)->getFragmentProgramParameters();
 }
 
 //|||||||||||||||||||||||||||||||||||||||||||||||

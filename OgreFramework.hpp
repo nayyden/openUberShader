@@ -83,7 +83,6 @@ private:
 	Ogre::Degree				m_RotateSpeed; 
 	float					m_MoveScale; 
 	Ogre::Degree				m_RotScale;
-    Ogre::MaterialPtr m_pMaterial;
     Ogre::GpuProgramPtr m_pVertexShader;
     Ogre::GpuProgramPtr m_pFragmentShader;
     Ogre::GpuProgramParametersSharedPtr vertexShaderParams;

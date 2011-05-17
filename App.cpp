@@ -49,10 +49,12 @@ void App::setupDemoScene()
     m_pCubeNode = OgreFramework::getSingletonPtr()->m_pSceneMgr->getRootSceneNode()->createChildSceneNode("CubeNode");
     m_pCubeNode->attachObject(m_pCubeEntity);
    
-    Ogre::MaterialPtr bumpMat = Ogre::MaterialManager::getSingletonPtr()->getByName("Simple");
-    m_pCubeEntity->setMaterial(bumpMat);
+  
+    Ogre::MaterialPtr simpleMat = Ogre::MaterialManager::getSingletonPtr()->getByName("Simple");
+    m_pCubeEntity->setMaterial(simpleMat);
     OgreFramework::getSingletonPtr()->setUpGUI();
     OgreFramework::getSingletonPtr()->setUpShaderParams();
+  
 }
 
 
