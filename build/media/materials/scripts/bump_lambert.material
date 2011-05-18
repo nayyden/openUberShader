@@ -8,7 +8,7 @@ fragment_program psBump glsl
 	source psBump.glsl
 }
 
-material Bump_OZONE
+material Bump_Lambert
 {
 	technique GLSL
 	{

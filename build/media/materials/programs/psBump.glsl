@@ -1,84 +1,95 @@
+/*
+Пиксел(Фрагмен) шейдър. Изпълнява се веднъж за всеки пиксел(фрагмен).
+*/
+
+/* 
+ * Константи за брой светлинни 
+ * източници
+ */
+#define MAX_LIGHTS 2
 #define NUM_LIGHTS 2
-#define MAX_LIGHTS 6
+
+// Масив от вектори които представляват посоката на светлинните източници
 varying vec3 lightVec[MAX_LIGHTS];
-varying vec3 eyeVec;
+// Вектор съдържащ координати на точка (от изображение), на които отговаря текущия фрагмент
 varying vec2 texCoord;
-uniform sampler2D aoMap;
+
+/* Изображение което съдържа нормалния вектор на обекта, в текущия фрагмент, в локалната координатна система, 
+   като координатите (x,y,z) са записани съответно в (r,g,b) каналите на изображението.
+   За да е възможно записването на стойности от интервала [-1,1] в каналите (които приемат само [0,1])
+   всеки координат е увеличен с 1 и разделен на 2. Тоест в шейдъра трябва да се направи обратното  */
 uniform sampler2D normalMap;
-uniform float invRadius;
-uniform float fRoughness;
+
+/* Този коефициент се използва за да намали/увеличи осветлението в/у обекта.
+   Ирае ролята на радиус в който светлината дава отражение.
+   Наричаме го инвертиран защото стойност 0,001 означава радиус 1000. */
+uniform float inversedRadius;
+
+// Стойност с която озачаваме дали използваме един или повече светлинни източници ( 0 за един, 1 за повече)
 uniform int multiLight;
+
 void main (void)
 {
-	vec4 final_color = vec4(0.0, 0.0, 0.0, 0.0);
+	// Инициализация на необходимите променливи
+	vec4  final_color = vec4(0.0, 0.0, 0.0, 0.0);
 	float att = 0.0;
-	vec3 norm =  texture2D(normalMap, texCoord).xyz ;
-	vec3 n = normalize( norm* 2.0 - 1.0);
-	const float PI = 3.14159;
-	int i;
-	float base = texture2D(aoMap, texCoord).r;
 	
-	if(multiLight == 0) {
-		float distSqr = dot(lightVec[0], lightVec[0]);
-		att = clamp(1.0 - invRadius * sqrt(distSqr), 0.0, 1.0);
-		vec3 lVec = lightVec[0] * inversesqrt(distSqr);
 
-		vec3 vVec = normalize(eyeVec);
-		vec3 R = reflect(-vVec, n);
+	// От изображението normalMap се извлича нормалата на обекта в текущия фрагмент, 
+	// като се взима пиксел от изображението с координатите в texCoord
+	vec3 norm =  texture2D(normalMap, texCoord).xyz ;
+
+	/* Правим необходимите преобразования на координатите както е описано по-горе,
+	   normalize() връща същия вектор с дължина 1.0  */
+	vec3 n = normalize( norm* 2.0 - 1.0);
+	
+	// Ако имаме само един светлинен източник:
+	if(multiLight == 0) {
+		// Вертекс шейдърът е подал посоката само на един свтлинен източник
+		// Намираме неговия скаларен квадрат
+		float distSqr = dot(lightVec[0], lightVec[0]);
+		
+		/* Намираме силта на осветяване в даден пиксел, както е дефинирана в теорията
+		   а чрез clamp() изрязваме стойността между 0 и 1*/
+		att = clamp(1.0 - inversedRadius * sqrt(distSqr), 0.0, 1.0);
+		vec3 lVec = lightVec[0] * inversesqrt(distSqr);
+		
+		/* Тъй като glsl може да извлече състоянието на обектите като текущ цвят и т.н., 
+		   можем да вземем цветът на светлината и на материала на обекта както са настроени в opengl
+		   и да добавим техния ефект към шейдъра. */
 		vec4 vAmbient = gl_LightSource[0].ambient * gl_FrontMaterial.ambient;
-	
-		float diffuse = max( dot(lVec, n), 0.0 );	
+		
+		/* Средният тон на цвета в текущия фрагмент, според посоката на светлината и нормалата в пиксела
+		   двата вектора са нормализирани, при което dot() ни дава косинуса на ъгъла м/у двата вектора
+		   Ако той е отрицателен го приемаме за 0, тоест светлината там няма да има ефект */
+		float diffuse = max( dot(lVec, n), 0.0 );
+		
+		/* Цветът на обекта както е зададен в opengl се изсветлява/затъмнява според изчисления горе косинус*/ 
 		vec4 vDiffuse = gl_FrontMaterial.diffuse * diffuse  ;	
-		final_color += vDiffuse;
+		
+		// В последната стъпка прибавяме получения цвят към крайния.
+		final_color = vDiffuse + vAmbient;
+
+	// Ако имаме повече от един светлинен източник:
 	} else if(multiLight == 1) {
-	
+		int   i   = 0.0;
+		// Обхождаме всички свтлинни източници. Изчисленията са аналогични.
 		for(i = 0; i < NUM_LIGHTS; i++) {
 		
 			float distSqr = dot(lightVec[i], lightVec[i]);
-			att = clamp(1.0 - invRadius * sqrt(distSqr), 0.0, 1.0);
+			att = clamp(1.0 - inversedRadius * sqrt(distSqr), 0.0, 1.0);
 			vec3 lVec = lightVec[i] * inversesqrt(distSqr);
 
-			vec3 vVec = normalize(eyeVec);
-			vec3 R = reflect(-vVec, n);
 			vec4 vAmbient = gl_LightSource[i].ambient * gl_FrontMaterial.ambient;
 			
 			float diffuse = max( dot(lVec, n), 0.0 );	
 			vec4 vDiffuse = gl_FrontMaterial.diffuse * diffuse  ;	
+			
+			// Всяка светлина прибавя своя ефект към крайния цвят
 			final_color += vDiffuse + vAmbient;
 		}
 	}
-  /*  // Compute the other aliases
-    float alpha    = max( acos( dot( vVec, n ) ), acos( dot( lVec, n ) ) );
-	
-    float beta     = min( acos( dot(lVec, n ) ), acos( dot( vVec, n ) ) );
-    float gamma    = dot( vVec - n * dot( vVec, n ), lVec- n * dot( lVec, n ) );
-    float rough_sq = fRoughness * fRoughness;
- 
-    float C1       = 1.0 - 0.5 * ( rough_sq / ( rough_sq + 0.33 ) );
- 
-    float C2       = 0.45 * ( rough_sq / ( rough_sq + 0.09 ) );
-    if( gamma >= 0.0 )
-    {
-        C2 *= sin( alpha );
-    }
-    else
-    {
-        C2 *= ( sin( alpha ) - pow( (2.0 * beta) / PI, 3.0 ) );
-    }
- 
-    float C3  = (1.0 / 8.0) ;
-    C3       *= ( rough_sq / ( rough_sq + 0.09 ) );
-    C3       *= pow( ( 4.0 * alpha * beta ) / (PI * PI), 2.0 );
- 
-    float A = gamma * C2 * tan( beta );
-    float B = (1.0 - abs( gamma )) * C3 * tan( (alpha + beta) / 2.0 );
- 
-   vec3 final =  base *  
-		gl_FrontMaterial.diffuse.xyz * max( 0.0, dot( n, lVec) ) * ( C1 + A + B );
-
-	gl_FragColor = vec4(final, 1.0); */
     	
-	gl_FragColor = (final_color ) * att ; // comment this for oren nayar
-	
-	
+	// Изходният цвят. Всеки фрагмент шейдър трябва да запише изходния си цвят в тази променлива.
+	gl_FragColor = (final_color ) * att ;
 }

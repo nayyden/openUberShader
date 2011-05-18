@@ -300,7 +300,7 @@ void OgreFramework::setUpShaderParams()
 {
     
    
-    Ogre::MaterialPtr mat = Ogre::MaterialManager::getSingletonPtr()->getByName("Bump_OZONE");
+    Ogre::MaterialPtr mat = Ogre::MaterialManager::getSingletonPtr()->getByName("Bump_Lambert");
     vertexShaderParams = mat->getTechnique(0)->getPass(0)->getVertexProgramParameters();
     fragmentShaderParams = mat->getTechnique(0)->getPass(0)->getFragmentProgramParameters();
 }
@@ -332,7 +332,7 @@ void OgreFramework::checkBoxToggled(OgreBites::CheckBox *checkBox)
 {
     if(checkBox->getName() == "MatSwitch") {
         if(checkBox->isChecked()) {
-          Ogre::MaterialPtr bumpMat = Ogre::MaterialManager::getSingletonPtr()->getByName("Bump_OZONE");
+          Ogre::MaterialPtr bumpMat = Ogre::MaterialManager::getSingletonPtr()->getByName("Bump_Lambert");
           Ogre::Entity *ent =  this->m_pSceneMgr->getEntity("Cube");
           ent->setMaterial(bumpMat);
         } else if(!checkBox->isChecked()) {
