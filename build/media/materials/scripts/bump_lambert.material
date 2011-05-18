@@ -22,9 +22,7 @@ material Bump_Lambert
 			fragment_program_ref psBump
 			{
 				param_named normalMap int 1
-				param_named aoMap int 0
 				param_named invRadius float 0.0
-				param_named fRoughness float 0.7
 				param_named multiLight int 1
 			}
 			texture_unit
