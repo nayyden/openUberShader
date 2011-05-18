@@ -149,6 +149,7 @@ void OgreFramework::setUpGUI()
     menu->selectItem(0, false);
     enableLight =  m_pTrayMgr->createCheckBox(OgreBites::TL_TOPRIGHT, "EnableLight", "Enable");
     enableLight->setChecked(true, false);
+    enableLight->hide();
 
     lightPosx = m_pTrayMgr->createLongSlider(OgreBites::TL_TOPRIGHT, "LightX", "LightX", 100, 60, -400.0f, 400.0f, 256);
     lightPosy = m_pTrayMgr->createLongSlider(OgreBites::TL_TOPRIGHT, "LightY", "LightY", 100, 60, -400.0f, 400.0f, 256);
@@ -354,10 +355,17 @@ void OgreFramework::checkBoxToggled(OgreBites::CheckBox *checkBox)
     }
     
     if(checkBox->getName() == "MultiLights") {
+        Ogre::Light *light =  this->m_pSceneMgr->getLight("Light1");
         if(checkBox->isChecked()) {
+            if(!light->isVisible())
+                light->setVisible(true);
+            updateLightVis();
             this->vertexShaderParams->setNamedConstant("multiLight", 1);
             this->fragmentShaderParams->setNamedConstant("multiLight", 1);
-        } else {          
+        } else {
+           if(light->isVisible())
+                light->setVisible(false);
+            updateLightVis();
             this->vertexShaderParams->setNamedConstant("multiLight", 0);
             this->fragmentShaderParams->setNamedConstant("multiLight", 0);
         }
